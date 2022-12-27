@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         小黑子
-// @namespace    https://github.com/peterxiong720/xiaoheizi/
-// @version      1.14.514
+// @namespace    https://github.com/PeterXiong720/BlackKun/
+// @version      114.514.1
 // @license      MIT
 // @description  小黑子，露出鸡脚了吧！
 // @author       PeterXiong720

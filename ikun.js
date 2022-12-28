@@ -10,26 +10,21 @@
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // ==/UserScript==
+// noinspection NonAsciiCharacters
 
 // 是否开启调试模式
 const Debug = false;
 
 // 调试输出函数
-function debug(...args)
-{
-    if (!Debug)
-    {
+function debug(...args) {
+    if (!Debug) {
         return;
     }
 
-    for (let str of args)
-    {
-        try
-        {
+    for (let str of args) {
+        try {
             console.log((str));
-        }
-        catch (e)
-        {
+        } catch (e) {
             console.log(JSON.stringify(str));
         }
     }
@@ -37,16 +32,35 @@ function debug(...args)
 
 // 是否开启无差别模式
 const enablePlusMode = false;
+
 // 警告：开启后会替换所有读音为“ji”的汉字，可能会严重影响阅读，请谨慎开启！！！
 
-let body = document.getElementsByTagName('body')[0];
+// http工具类
+class HttpClient {
+    static async get(aUrl, aCallback) {
+        return new Promise((resolve, reject) => {
+            const anHttpRequest = new XMLHttpRequest();
+            anHttpRequest.onreadystatechange = function () {
+                if (anHttpRequest.readyState === 4 && anHttpRequest.status === 200) {
+                    resolve(anHttpRequest.responseText);
+                } else {
+                    reject({
+                        readyState: anHttpRequest.readyState,
+                        status: anHttpRequest.status
+                    });
+                }
+            }
+
+            anHttpRequest.open("GET", aUrl, true);
+            anHttpRequest.send(null);
+        });
+    }
+}
+
+const body = document.getElementsByTagName('body')[0];
 
 // iKun语录词典
 const dic = {
-    '鸡': '只因',
-    '机': '只因',
-    '基': '只因',
-
     '是不是想吃牢饭': '食不食香翅捞饭',
     '想吃牢饭是不是': '香翅捞饭食不食',
 
@@ -74,17 +88,18 @@ const dic = {
     '理智': '荔枝',
     '普信男': '蒲杏楠',
     '真下头': '蒸虾头',
-    '下头': '虾头'
+    '下头': '虾头',
+
+    '鸡': '只因',
+    '机': '只因',
+    '基': '只因'
 };
 
-function checkWord(str)
-{
+function checkWord(str) {
     debug(dic);
-    for (let word of Object.keys(dic))
-    {
+    for (let word of Object.keys(dic)) {
         debug(word);
-        if (str.indexOf(word) != -1)
-        {
+        if (str.indexOf(word) !== -1) {
             debug('已发现可替换词汇');
             return true;
         }
@@ -93,11 +108,9 @@ function checkWord(str)
     return false;
 }
 
-function changeWord(str)
-{
+function changeWord(str) {
     let retStr = str;
-    for (let key in dic)
-    {
+    for (let key in dic) {
         debug(key);
         debug(dic[key]);
         retStr = retStr.replaceAll(key, dic[key]);
@@ -106,20 +119,17 @@ function changeWord(str)
     return retStr;
 }
 
-function getChinese(strValue)
-{
-    if (strValue !== null && strValue !== '')
-    {
+function getChinese(strValue) {
+    if (strValue !== null && strValue !== '') {
         const reg = /[\u4e00-\u9fa5]/g;
+        // @ts-ignore
         return strValue.match(reg).join('');
     }
     return '';
 }
 
-function chicken()
-{
-    if (checkWord(body.innerHTML))
-    {
+function chicken() {
+    if (checkWord(body.innerHTML)) {
         body.innerHTML = changeWord(body.innerHTML);
 
         console.log('小黑子，露出鸡脚了吧！');
@@ -128,17 +138,14 @@ function chicken()
     setTimeout(chicken, 10000);
 }
 
-function chickenPlus()
-{
+function chickenPlus() {
     let chi = getChinese(body.innerHTML);
     debug(chi);
 
-    for (let char of chi)
-    {
+    for (let char of chi) {
         debug(char);
         let pingyin = cnchar.spell(char, 'tone', 'low');
-        if (pingyin == 'jī')
-        {
+        if (pingyin === 'jī') {
             body.innerHTML = body.innerHTML.replaceAll(char, '只因');
         }
     }
@@ -146,9 +153,15 @@ function chickenPlus()
     setTimeout(chickenPlus, 12000);
 }
 
-setTimeout(chicken, 100);
+(async function () {
+    // TODO
 
-if (enablePlusMode)
-{
-    setTimeout(chickenPlus, 100);
-}
+    // 加载网页后先执行一次再进入循环
+    setTimeout(chicken, 100);
+    if (enablePlusMode) {
+        setTimeout(chickenPlus, 100);
+    }
+
+    console.log('iKun助手 v114.514.2 作者：Bilili@FingerInMyAss');
+    console.log('https://space.bilibili.com/358524238');
+})();

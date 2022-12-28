@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         小黑子
+// @name         iKun助手
 // @namespace    https://github.com/PeterXiong720/BlackKun/
 // @require      https://unpkg.com/cnchar/cnchar.min.js
-// @version      114.514.1
+// @version      114.514.3
 // @license      MIT
 // @description  小黑子，露出鸡脚了吧！
 // @author       PeterXiong720
@@ -31,30 +31,27 @@ function debug(...args) {
 }
 
 // 是否开启无差别模式
+// 警告：开启后会替换所有读音为“ji”的汉字，可能会严重影响阅读，请谨慎开启！！！
 const enablePlusMode = false;
 
-// 警告：开启后会替换所有读音为“ji”的汉字，可能会严重影响阅读，请谨慎开启！！！
+// http get
+function httpGet(aUrl, aCallback) {
+    return new Promise((resolve, reject) => {
+        const anHttpRequest = new XMLHttpRequest();
+        let times = 0;
+        anHttpRequest.onreadystatechange = function () {
+            if (anHttpRequest.responseText !== '') {
+                resolve(`${anHttpRequest.responseText}`);
 
-// http工具类
-class HttpClient {
-    static async get(aUrl, aCallback) {
-        return new Promise((resolve, reject) => {
-            const anHttpRequest = new XMLHttpRequest();
-            anHttpRequest.onreadystatechange = function () {
-                if (anHttpRequest.readyState === 4 && anHttpRequest.status === 200) {
-                    resolve(anHttpRequest.responseText);
-                } else {
-                    reject({
-                        readyState: anHttpRequest.readyState,
-                        status: anHttpRequest.status
-                    });
-                }
+            } else if (times >= 3) {
+                resolve('{}');
             }
+            times++;
+        }
 
-            anHttpRequest.open("GET", aUrl, true);
-            anHttpRequest.send(null);
-        });
-    }
+        anHttpRequest.open('GET', aUrl, true);
+        anHttpRequest.send(null);
+    });
 }
 
 const body = document.getElementsByTagName('body')[0];
@@ -154,14 +151,21 @@ function chickenPlus() {
 }
 
 (async function () {
-    // TODO
-
-    // 加载网页后先执行一次再进入循环
+    // 加载网页后先执行一次再进入延时循环
     setTimeout(chicken, 100);
     if (enablePlusMode) {
         setTimeout(chickenPlus, 100);
     }
 
-    console.log('iKun助手 v114.514.2 作者：Bilili@FingerInMyAss');
+    console.log('iKun助手 v114.514.3 作者：Bilili@FingerInMyAss');
     console.log('https://space.bilibili.com/358524238');
+
+    // 加载云词库
+    let json = await httpGet('https://raw.githubusercontent.com/PeterXiong720/BlackKun/master/data.json');
+    debug(json);
+    let remoteData = JSON.parse(json);
+    for (let key in remoteData) {
+        debug(`key: ${key}, value: old- ${dic[key]} new- ${remoteData[key]}`);
+        dic[key] = remoteData[key];
+    }
 })();

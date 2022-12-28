@@ -1,0 +1,10 @@
+{
+  "name": "BlackKun",
+  "version": "114.514.2",
+  "description": "小黑子，食不食油饼！",
+  "main": "ikun.ts",
+  "repository": "https://github.com/PeterXiong720/BlackKun/",
+  "author": "PeterXiong720",
+  "license": "MIT",
+  "private": false
+}

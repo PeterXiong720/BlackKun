@@ -6,6 +6,6 @@
 
 1. 安装一个脚本加载器，比如[Tampermonkey](https://www.tampermonkey.net/)。
 
-2. 添加`ikun.js`为用户脚本。
+2. 添加`ikun.ts`为用户脚本。
 
 3. 完成
